@@ -1,0 +1,102 @@
+package com.castronu.joomladsl.domain;
+
+import javax.persistence.Basic;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+/**
+ * Created with IntelliJ IDEA.
+ * User: diegocastronuovo
+ * Date: 13/04/13
+ * Time: 00:30
+ * To change this template use File | Settings | File Templates.
+ */
+@javax.persistence.Table(name = "d47tu_usergroups", schema = "", catalog = "testJoomlaDsl")
+@Entity
+public class D47TuUsergroupsEntity {
+    private int id;
+
+    @javax.persistence.Column(name = "id")
+    @Id
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    private int parentId;
+
+    @javax.persistence.Column(name = "parent_id")
+    @Basic
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
+    }
+
+    private int lft;
+
+    @javax.persistence.Column(name = "lft")
+    @Basic
+    public int getLft() {
+        return lft;
+    }
+
+    public void setLft(int lft) {
+        this.lft = lft;
+    }
+
+    private int rgt;
+
+    @javax.persistence.Column(name = "rgt")
+    @Basic
+    public int getRgt() {
+        return rgt;
+    }
+
+    public void setRgt(int rgt) {
+        this.rgt = rgt;
+    }
+
+    private String title;
+
+    @javax.persistence.Column(name = "title")
+    @Basic
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        D47TuUsergroupsEntity that = (D47TuUsergroupsEntity) o;
+
+        if (id != that.id) return false;
+        if (lft != that.lft) return false;
+        if (parentId != that.parentId) return false;
+        if (rgt != that.rgt) return false;
+        if (title != null ? !title.equals(that.title) : that.title != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id;
+        result = 31 * result + parentId;
+        result = 31 * result + lft;
+        result = 31 * result + rgt;
+        result = 31 * result + (title != null ? title.hashCode() : 0);
+        return result;
+    }
+}

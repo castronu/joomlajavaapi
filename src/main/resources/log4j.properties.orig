@@ -1,0 +1,7 @@
+log4j.debug=false
+
+# Set root logger to DEBUG and add an appender called A1.
+log4j.rootLogger=INFO
+
+log4j.logger.org.hibernate.SQL=INFO
+log4j.logger.org.hibernate.type=INFO
