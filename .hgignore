@@ -21,4 +21,4 @@ syntax: glob
 target/*
 logs/*
 out/*
-.iml
+
