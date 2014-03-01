@@ -79,11 +79,25 @@ public class JoomlaJavaApi {
         String[] splittedPath = categoryPath.split("/");
         String internalPath=splittedPath[0];
 
+        try {
+            createACategory(internalPath);
+            LOGGER.info(internalPath + " category created");
+
+        } catch (GenericErrorException e) {
+            LOGGER.error("error",e);
+        }
+
+        if (splittedPath.length==1) {
+           return;
+        }
+
+
         for (int i=1;i<splittedPath.length;i++){
             internalPath+="/"+splittedPath[i];
             try {
                 createACategory(internalPath);
                 LOGGER.info(internalPath + " category created");
+
             } catch (GenericErrorException e) {
                 LOGGER.error("Problems creating category",e);
             }

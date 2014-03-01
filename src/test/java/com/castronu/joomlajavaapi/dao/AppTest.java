@@ -10,8 +10,9 @@ public class AppTest {
 	 @org.junit.Test
 	    public void testApp() throws Exception, GenericErrorException {
          /*JoomlaJavaApi app = new JoomlaJavaApi();
-         app.createCategory("Gli Stati Uniti/Il michigan3");
-         app.createArticle("Titolo2","Questo è il mio secondo articolo","http://","Gli Stati Uniti/Il michigan","description","keywords");
+         app.createCategory("b/b1");
+         app.createCategory("b/b2");
+         //app.createArticle("Titolo2","Questo è il mio secondo articolo","http://","Gli Stati Uniti/Il michigan","description","keywords");
          */
 	    }
 
