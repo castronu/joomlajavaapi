@@ -1,4 +1,5 @@
 package com.castronu.joomlajavaapi.app;
+
 import com.castronu.joomlajavaapi.Context;
 import com.castronu.joomlajavaapi.dao.CategoryDao;
 import com.castronu.joomlajavaapi.dao.ContentDao;
@@ -21,97 +22,97 @@ import java.io.File;
 public class JoomlaJavaApi {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(JoomlaJavaApi.class);
-    private AnnotationConfigApplicationContext applicationContext;
-    private ContentDao contentDao;
-    private CategoryDao categoryDao;
-    private MenuDao menuDao;
-    public JoomlaJavaApi(){
-    	applicationContext = new AnnotationConfigApplicationContext(Context.class);
-    	contentDao =  applicationContext.getBean(ContentDao.class);
-    	categoryDao = applicationContext.getBean(CategoryDao.class);
-    	menuDao = applicationContext.getBean(MenuDao.class);
+    private final ContentDao contentDao;
+    private final CategoryDao categoryDao;
+    private final MenuDao menuDao;
+
+    public JoomlaJavaApi(ContentDao contentDao, CategoryDao categoryDao, MenuDao menuDao) {
+        this.contentDao = contentDao;
+        this.categoryDao = categoryDao;
+        this.menuDao = menuDao;
     }
 
-    public void createArticle(String title,String content,String link,String categoryPath,String description,String keywords) throws GenericErrorException{
-    	String convertePath=Converter.getPath(categoryPath);
+    public void createArticle(String title, String content, String link, String categoryPath, String description, String keywords) throws GenericErrorException {
+        String convertePath = Converter.getPath(categoryPath);
 
-    	String alias=Converter.getAlias(title);
-    	String path=Converter.getPath(categoryPath)+"/"+alias;
-        System.out.println("title="+title+"alias="+alias+" Path="+path);
+        String alias = Converter.getAlias(title);
+        String path = Converter.getPath(categoryPath) + "/" + alias;
+        System.out.println("title=" + title + "alias=" + alias + " Path=" + path);
 
         File file = new File(path);
 
-  	  String parentCategoryPath = file.getParent();
+        String parentCategoryPath = file.getParent();
 
 
-    	  contentDao.createArticle(title.trim(),alias,content,link,path,description,keywords);
+        contentDao.createArticle(title.trim(), alias, content, link, path, description, keywords);
 
 
-		  int categoryId=categoryDao.getCategoryFromPath(parentCategoryPath).get(0).getId();
-		  System.out.println("category id"+categoryId);
-    	  int parentMenuId = menuDao.getMenuWithThisPath(parentCategoryPath).get(0).getId();
+        int categoryId = categoryDao.getCategoryFromPath(parentCategoryPath).get(0).getId();
+        System.out.println("category id" + categoryId);
+        int parentMenuId = menuDao.getMenuWithThisPath(parentCategoryPath).get(0).getId();
 
-    	  int articleId=contentDao.getArticleInCategoryFromCatiDAndTitle(title, categoryId).get(0).getId();
+        int articleId = contentDao.getArticleInCategoryFromCatiDAndTitle(title, categoryId).get(0).getId();
 
-    	  System.out.println(title+"  "+alias+ "   "+ path+"    "+ articleId+"    "+ parentMenuId);
-    	  menuDao.createMenuArticle(title, alias, path, articleId,parentMenuId);
+        System.out.println(title + "  " + alias + "   " + path + "    " + articleId + "    " + parentMenuId);
+        menuDao.createMenuArticle(title, alias, path, articleId, parentMenuId);
     }
 
-    public void deleteArticle(String tilte,String categoryPath) throws GenericErrorException{
-  	  contentDao.deleteArticle(tilte,categoryPath);
-  }
+    public void deleteArticle(String tilte, String categoryPath) throws GenericErrorException {
+        contentDao.deleteArticle(tilte, categoryPath);
+    }
 
     private int createACategory(String categoryPath) throws GenericErrorException {
 
-        String path=Converter.getPath(categoryPath);
-        String alias=Converter.getAlias(categoryPath);
-        String title=Converter.getTitle(categoryPath);
+        String path = Converter.getPath(categoryPath);
+        String alias = Converter.getAlias(categoryPath);
+        String title = Converter.getTitle(categoryPath);
         //categoryPath="La Spagna"
         System.out.println(path);
         System.out.println(alias);
         System.out.println(title);
-        return categoryDao.createCategory(title,alias,path);
+        return categoryDao.createCategory(title, alias, path);
         //menuDao.createMenuCategory(categoryPath,categoryId);
 
     }
 
     public void createCategory(String categoryPath) {
         String[] splittedPath = categoryPath.split("/");
-        String internalPath=splittedPath[0];
+        String internalPath = splittedPath[0];
 
         try {
-            createACategory(internalPath);
-            LOGGER.info(internalPath + " category created");
+            int aCategory = createACategory(internalPath);
+            if (aCategory != 0) {
+                LOGGER.info(internalPath + " category created");
+            } else {
+                LOGGER.info("category {} not created created", internalPath);
+            }
+            ;
 
         } catch (GenericErrorException e) {
-            LOGGER.error("error",e);
+            LOGGER.error("error", e);
         }
 
-        if (splittedPath.length==1) {
-           return;
+        if (splittedPath.length == 1) {
+            return;
         }
 
-
-        for (int i=1;i<splittedPath.length;i++){
-            internalPath+="/"+splittedPath[i];
+        for (int i = 1; i < splittedPath.length; i++) {
+            internalPath += "/" + splittedPath[i];
             try {
                 createACategory(internalPath);
                 LOGGER.info(internalPath + " category created");
 
             } catch (GenericErrorException e) {
-                LOGGER.error("Problems creating category",e);
+                LOGGER.error("Problems creating category", e);
             }
 
         }
     }
 
-
-
-
     private void createMenuAndCategory(String internalPath) {
-        String path= Converter.getPath(internalPath);
-        String alias=Converter.getAlias(internalPath);
-        String title=Converter.getTitle(internalPath);
+        String path = Converter.getPath(internalPath);
+        String alias = Converter.getAlias(internalPath);
+        String title = Converter.getTitle(internalPath);
         try {
             int categoryId = createACategory(internalPath);
             menuDao.createMenuCategory(title, alias, path, categoryId);
@@ -119,11 +120,6 @@ public class JoomlaJavaApi {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
-
-
-
-
-
 
 }
 

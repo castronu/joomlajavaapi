@@ -4,6 +4,7 @@ import java.util.*;
 
 import javax.sql.DataSource;
 
+import com.castronu.joomlajavaapi.app.JoomlaJavaApi;
 import com.castronu.joomlajavaapi.dao.CategoryDao;
 import com.castronu.joomlajavaapi.dao.ContentDao;
 import com.castronu.joomlajavaapi.dao.MenuDao;
@@ -36,9 +37,14 @@ import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBea
 public class Context
 {
 
-
     @Autowired
     Environment environment;
+
+    @Bean
+    public JoomlaJavaApi joomlaJavaApi(SessionFactory sessionFactory){
+        return new JoomlaJavaApi(contentDao(sessionFactory),
+                categoryDao(sessionFactory),menuDao(sessionFactory));
+    }
 
     @Bean
     public CategoryDao categoryDao(SessionFactory sessionFactory) {

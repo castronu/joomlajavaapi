@@ -49,7 +49,8 @@ public class CategoryDao extends HibernateDaoSupport {
     @SuppressWarnings("unchecked")
     public int createCategory(String title, String alias, String path) throws GenericErrorException {
         if (getCategoryFromPath(path).size() != 0) {
-            throw new GenericErrorException("There is already a category for the path " + path);
+            LOGGER.info("There is already a category for the path {}", path);
+            return 0;
         }
         Category category = aCategoryWithPath(title,alias,path);
 
