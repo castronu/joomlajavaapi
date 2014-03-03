@@ -1,14 +1,13 @@
 package com.castronu.joomlajavaapi.app;
 
-import com.castronu.joomlajavaapi.Context;
 import com.castronu.joomlajavaapi.dao.CategoryDao;
 import com.castronu.joomlajavaapi.dao.ContentDao;
 import com.castronu.joomlajavaapi.dao.MenuDao;
 
+import com.castronu.joomlajavaapi.exception.CategoryAlreadyExistException;
 import com.castronu.joomlajavaapi.exception.GenericErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.File;
 
@@ -17,7 +16,6 @@ import java.io.File;
  * User: diegocastronuovo
  * Date: 13/04/13
  * Time: 00:33
- * To change this template use File | Settings | File Templates.
  */
 public class JoomlaJavaApi {
 
@@ -61,35 +59,26 @@ public class JoomlaJavaApi {
         contentDao.deleteArticle(tilte, categoryPath);
     }
 
-    private int createACategory(String categoryPath) throws GenericErrorException {
+    private int createACategory(String categoryPath) throws GenericErrorException, CategoryAlreadyExistException {
 
         String path = Converter.getPath(categoryPath);
         String alias = Converter.getAlias(categoryPath);
         String title = Converter.getTitle(categoryPath);
-        //categoryPath="La Spagna"
-        System.out.println(path);
-        System.out.println(alias);
-        System.out.println(title);
-        return categoryDao.createCategory(title, alias, path);
-        //menuDao.createMenuCategory(categoryPath,categoryId);
+        return categoryDao.createCategoryAndReturnCategoryId(title, alias, path);
 
     }
 
-    public void createCategory(String categoryPath) {
+    public void createCategoriesInCascade(String categoryPath) {
         String[] splittedPath = categoryPath.split("/");
         String internalPath = splittedPath[0];
 
         try {
-            int aCategory = createACategory(internalPath);
-            if (aCategory != 0) {
-                LOGGER.info(internalPath + " category created");
-            } else {
-                LOGGER.info("category {} not created created", internalPath);
-            }
-            ;
-
+            createACategory(internalPath);
+            LOGGER.info("Category {} created", internalPath);
         } catch (GenericErrorException e) {
-            LOGGER.error("error", e);
+            LOGGER.error("Category not created, error:", e);
+        } catch (CategoryAlreadyExistException e) {
+            LOGGER.info("Category {} already exist", e.getCategory());
         }
 
         if (splittedPath.length == 1) {
@@ -98,12 +87,14 @@ public class JoomlaJavaApi {
 
         for (int i = 1; i < splittedPath.length; i++) {
             internalPath += "/" + splittedPath[i];
+
             try {
                 createACategory(internalPath);
-                LOGGER.info(internalPath + " category created");
-
+                LOGGER.info("Category {} created", internalPath);
             } catch (GenericErrorException e) {
-                LOGGER.error("Problems creating category", e);
+                LOGGER.error("Category not created, error:", e);
+            } catch (CategoryAlreadyExistException e) {
+                LOGGER.info("Category {} already exist", e.getCategory());
             }
 
         }
@@ -113,11 +104,15 @@ public class JoomlaJavaApi {
         String path = Converter.getPath(internalPath);
         String alias = Converter.getAlias(internalPath);
         String title = Converter.getTitle(internalPath);
+        int categoryId = 0;
         try {
-            int categoryId = createACategory(internalPath);
+            categoryId = createACategory(internalPath);
             menuDao.createMenuCategory(title, alias, path, categoryId);
+        } catch (CategoryAlreadyExistException e) {
+            LOGGER.info("Category {} already exist", e.getCategory());
         } catch (GenericErrorException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            LOGGER.error("Problems creating category and menu, error:", e);
+
         }
     }
 

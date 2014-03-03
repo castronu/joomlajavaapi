@@ -1,6 +1,7 @@
 package com.castronu.joomlajavaapi.dao;
 
 import com.castronu.joomlajavaapi.domain.Category;
+import com.castronu.joomlajavaapi.exception.CategoryAlreadyExistException;
 import com.castronu.joomlajavaapi.exception.GenericErrorException;
 import com.castronu.joomlajavaapi.utils.JoomlaDslUtils;
 import org.hibernate.criterion.DetachedCriteria;
@@ -47,10 +48,9 @@ public class CategoryDao extends HibernateDaoSupport {
     }
 
     @SuppressWarnings("unchecked")
-    public int createCategory(String title, String alias, String path) throws GenericErrorException {
+    public int createCategoryAndReturnCategoryId(String title, String alias, String path) throws GenericErrorException, CategoryAlreadyExistException {
         if (getCategoryFromPath(path).size() != 0) {
-            LOGGER.info("There is already a category for the path {}", path);
-            return 0;
+            throw new CategoryAlreadyExistException(path);
         }
         Category category = aCategoryWithPath(title,alias,path);
 

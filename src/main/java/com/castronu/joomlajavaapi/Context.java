@@ -73,7 +73,7 @@ public class Context
         return new PropertySourcesPlaceholderConfigurer();
     }
 
-    @Bean()
+    @Bean
     public DataSource getDataSource()
     {
         DriverManagerDataSource ds = new DriverManagerDataSource();

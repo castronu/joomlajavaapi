@@ -14,10 +14,8 @@ import static org.junit.Assert.assertThat;
  */
 public class ConverterTest {
 
-
-
     @Test
-    public void testGetPath() throws Exception {
+    public void testGetPathTitleAndAlias() throws Exception {
         String categoryPath="I viaggi/In Italia";
         assertThat(Converter.getPath(categoryPath),is("i-viaggi/in-italia"));
         assertThat(Converter.getAlias(categoryPath),is("in-italia"));
@@ -30,13 +28,4 @@ public class ConverterTest {
 
     }
 
-    @Test
-    public void testGetTitle() throws Exception {
-
-    }
-
-    @Test
-    public void testGetAlias() throws Exception {
-
-    }
 }

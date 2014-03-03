@@ -1,8 +1,17 @@
 package com.castronu.joomlajavaapi.dao;
 
-import com.castronu.joomlajavaapi.app.JoomlaJavaApi;
+import com.castronu.joomlajavaapi.ContextTest;
 import com.castronu.joomlajavaapi.domain.Category;
-import org.junit.Ignore;
+import com.castronu.joomlajavaapi.exception.CategoryAlreadyExistException;
+import com.castronu.joomlajavaapi.exception.GenericErrorException;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+
+import java.util.List;
 
 import static com.castronu.joomlajavaapi.builder.CategoryBuilder.aCategoryWithPath;
 import static org.hamcrest.CoreMatchers.is;
@@ -14,19 +23,43 @@ import static org.junit.Assert.assertThat;
  * User: diegocastronuovo
  * Date: 13/04/13
  * Time: 02:44
- * To change this template use File | Settings | File Templates.
  */
-@Ignore("To refactor")
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = ContextTest.class)
 public class CategoryDaoTest {
+
+    @Autowired
+    CategoryDao categoryDao;
+
     @org.junit.Test
-    public void testGetDefaultCategory() throws Exception {
-        Category defaultCategory = aCategoryWithPath("Barcelona", "Barcelona", "catalunia/barcelona");
-        assertThat(defaultCategory.getLevel(),is(2));
-        assertThat(defaultCategory.getTitle(),is("Barcelona"));
-        assertThat(defaultCategory.getAlias(),is("Barcelona"));
-        assertThat(defaultCategory.getPath(),is("catalunia/barcelona"));
+    public void testSaveLoadAndDelete() throws Exception, GenericErrorException, CategoryAlreadyExistException {
+
+        String categoryPath = "gli-stati-uniti";
+        int id=categoryDao.createCategoryAndReturnCategoryId("Gli Stati Uniti","usa", categoryPath);
+        List<Category> categoryFromPath = categoryDao.getCategoryFromPath(categoryPath);
+        assertThat(categoryFromPath.size(), is(1));
+        Category category = categoryFromPath.get(0);
+        assertThat(category.getId(), is(id));
+        assertThat(category.getId(), is(id));
+        assertThat(category.getAlias(), is("usa"));
+        assertThat(category.getTitle(), is("Gli Stati Uniti"));
+
+        categoryDao.deleteCategory(categoryPath);
+        categoryFromPath = categoryDao.getCategoryFromPath(categoryPath);
+        assertThat(categoryFromPath.size(), is(0));
+
     }
 
+    @org.junit.Test(expected = CategoryAlreadyExistException.class)
+    public void testCategoryAlreadyExist() throws Exception, GenericErrorException, CategoryAlreadyExistException {
+
+        String categoryPath = "la-francia";
+        categoryDao.createCategoryAndReturnCategoryId("La Francia","francia", categoryPath);
+        categoryDao.createCategoryAndReturnCategoryId("La Francia","francia", categoryPath);
+
+    }
+
+    /*
     @org.junit.Test
     public void testGetDefaultCategoryWithConversion() throws Exception {
         Category defaultCategory = aCategoryWithPath("", "", "La Catalunia/Il Barcelona");
@@ -52,5 +85,5 @@ public class CategoryDaoTest {
         assertThat(defaultCategory.getTitle(),is("Spagna"));
         assertThat(defaultCategory.getAlias(),is("Spagna"));
         assertThat(defaultCategory.getPath(),is("spagna"));
-    }
+    } */
 }

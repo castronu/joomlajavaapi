@@ -19,6 +19,6 @@ public class JoomlaJavaApiStandalone {
         joomlaJavaApi.createArticle(title,content,link,categoryPath,description,keywords);
     }
     public static void createCategory(String categoryPath) {
-        joomlaJavaApi.createCategory(categoryPath);
+        joomlaJavaApi.createCategoriesInCascade(categoryPath);
     }
 }

@@ -1,8 +1,8 @@
 package com.castronu.joomlajavaapi.domain;
 
-import javax.persistence.Basic;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
@@ -19,6 +19,8 @@ public class Category {
 
     @javax.persistence.Column(name = "id")
     @Id
+    @GenericGenerator(name="gen",strategy="increment")
+    @GeneratedValue(generator="gen")
     public int getId() {
         return id;
     }
