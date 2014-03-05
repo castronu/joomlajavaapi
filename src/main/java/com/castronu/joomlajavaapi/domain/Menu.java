@@ -1,7 +1,10 @@
 package com.castronu.joomlajavaapi.domain;
 
+import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.Basic;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.sql.Timestamp;
 
@@ -19,6 +22,8 @@ public class Menu {
 
     @javax.persistence.Column(name = "id")
     @Id
+    @GenericGenerator(name="gen",strategy="increment")
+    @GeneratedValue(generator="gen")
     public int getId() {
         return id;
     }

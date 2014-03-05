@@ -3,8 +3,10 @@ package com.castronu.joomlajavaapi.dao;
 import java.io.File;
 import java.util.List;
 
+import com.castronu.joomlajavaapi.app.Converter;
 import com.castronu.joomlajavaapi.builder.MenuBuilder;
 import com.castronu.joomlajavaapi.exception.GenericErrorException;
+import com.sun.tools.javac.util.Convert;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Property;
 import org.slf4j.Logger;
@@ -28,20 +30,21 @@ public class MenuDao extends HibernateDaoSupport {
         List<Menu> menuWithThisPath = getMenuWithThisPath(path);
         if (menuWithThisPath.size()!=0) {
             throw new GenericErrorException("There is already a menu with this path " + path);
-
         }
         int parentId = computeParentId(path);
-        System.out.println("ParentId "+parentId);
         Menu menu = MenuBuilder.aMenuCategory(title, alias, path, categoryId,parentId);
         getHibernateTemplate().save(menu);
     }
 
-    public int computeParentId(String path){
+    public int computeParentId(String path) throws GenericErrorException {
         File file = new File(path);
         String parent = file.getParent();
         if (parent==null) {return 1;}
         else {
-            List<Menu> menuWithThisPath = getMenuWithThisPath(parent);
+            List<Menu> menuWithThisPath = getMenuWithThisPath(Converter.getPath(parent));
+            if (menuWithThisPath.size()==0) {
+                throw new GenericErrorException("No parent category menu found for parent "+parent);
+            }
             return menuWithThisPath.get(0).getId();
         }
 

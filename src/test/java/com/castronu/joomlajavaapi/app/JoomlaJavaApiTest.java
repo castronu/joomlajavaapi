@@ -2,7 +2,12 @@ package com.castronu.joomlajavaapi.app;
 
 import com.castronu.joomlajavaapi.ContextTest;
 import com.castronu.joomlajavaapi.dao.CategoryDao;
+import com.castronu.joomlajavaapi.dao.ContentDao;
+import com.castronu.joomlajavaapi.dao.MenuDao;
 import com.castronu.joomlajavaapi.domain.Category;
+import com.castronu.joomlajavaapi.domain.Content;
+import com.castronu.joomlajavaapi.domain.Menu;
+import com.castronu.joomlajavaapi.exception.GenericErrorException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +34,10 @@ public class JoomlaJavaApiTest {
     JoomlaJavaApi joomlaJavaApi;
     @Autowired
     CategoryDao categoryDao;
+    @Autowired
+    ContentDao contentDao;
+    @Autowired
+    MenuDao menuDao;
 
     @Test
     public void createCategoryTest(){
@@ -57,6 +66,21 @@ public class JoomlaJavaApiTest {
         assertThat(parentCategoryList.get(0).getPath(),is("sud-america/colombia"));
         assertThat(parentCategoryList.get(0).getTitle(),is("Colombia"));
 
+    }
+
+    @Test
+    public void createCategoryAndMenuWithParents(){
+
+        joomlaJavaApi.createCategoriesInCascadeWithMenu("Nord America/Colombia/Santa Marta");
+        List<Menu> menuWithThisPath = menuDao.getMenuWithThisPath("nord-america/colombia/santa-marta");
+        assertThat(menuWithThisPath.size(),is(1));
+        Menu menu = menuWithThisPath.get(0);
+        int parentId = menu.getParentId();
+        menuWithThisPath = menuDao.getMenuWithThisPath("nord-america/colombia");
+        assertThat(menuWithThisPath.size(),is(1));
+        assertThat(menuWithThisPath.get(0).getId(),is(parentId));
+
+
 
     }
 
@@ -77,6 +101,49 @@ public class JoomlaJavaApiTest {
 
 
     }
+
+    @Test
+    public void createArticle() throws GenericErrorException {
+
+        String categoryPath = "Sud America/Colombia/Santa Marta";
+        joomlaJavaApi.createCategoriesInCascade(categoryPath);
+        String articleTitle = "Palomino";
+        joomlaJavaApi.createArticle(articleTitle, "Ottimo link su Palomino", "http://www.palomino.com", categoryPath, "description","palomino keywords");
+
+        List<Category> categoryFromPath = categoryDao.getCategoryFromPath("sud-america/colombia/santa-marta");
+        assertThat(categoryFromPath.size(),is(1));
+        int categoryId = categoryFromPath.get(0).getId();
+        List<Content> articleInCategoryFromCatiDAndTitle = contentDao.getArticleInCategoryFromCatiDAndTitle(articleTitle, categoryId);
+        assertThat(articleInCategoryFromCatiDAndTitle.size(),is(1));
+
+    }
+
+    @Test
+    public void createMenuForCategoryTest() throws GenericErrorException {
+
+        String categoryPath = "Sud America/Colombia/Santa Marta";
+        joomlaJavaApi.createCategoriesInCascade(categoryPath);
+        joomlaJavaApi.createMenuForCategory("Sud America");
+        joomlaJavaApi.createMenuForCategory("Sud America/Colombia");
+        joomlaJavaApi.createMenuForCategory("Sud America/Colombia/Santa Marta");
+
+        List<Menu> menuWithThisPath = menuDao.getMenuWithThisPath(Converter.getPath(categoryPath));
+        assertThat(menuWithThisPath.size(),is(1));
+        Menu menu = menuWithThisPath.get(0);
+        assertThat(menu.getTitle(),is("Santa Marta"));
+        assertThat(menu.getAccess(),is(1));
+        assertThat(menu.getAlias(),is("santa-marta"));
+
+        menuWithThisPath = menuDao.getMenuWithThisPath("sud-america/colombia");
+        int expectedParentId = menuWithThisPath.get(0).getId();
+        int newExpectedParentId = menuWithThisPath.get(0).getParentId();
+        assertThat(menu.getParentId(), is(expectedParentId));
+
+
+        menuWithThisPath = menuDao.getMenuWithThisPath("sud-america");
+        assertThat(menuWithThisPath.get(0).getId(),is(newExpectedParentId));
+    }
+
 
 
 

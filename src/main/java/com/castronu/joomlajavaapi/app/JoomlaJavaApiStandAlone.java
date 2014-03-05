@@ -21,4 +21,10 @@ public class JoomlaJavaApiStandalone {
     public static void createCategory(String categoryPath) {
         joomlaJavaApi.createCategoriesInCascade(categoryPath);
     }
+    public static void createCategoryWithMenu(String categoryPath) {
+        joomlaJavaApi.createCategoriesInCascadeWithMenu(categoryPath);
+    }
+    public static void createMenuForCategory(String categoryPath) {
+        joomlaJavaApi.createMenuForCategory(categoryPath);
+    }
 }
