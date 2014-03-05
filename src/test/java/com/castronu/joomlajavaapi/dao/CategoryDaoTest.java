@@ -35,7 +35,7 @@ public class CategoryDaoTest {
     public void testSaveLoadAndDelete() throws Exception, GenericErrorException, CategoryAlreadyExistException {
 
         String categoryPath = "gli-stati-uniti";
-        int id=categoryDao.createCategoryAndReturnCategoryId("Gli Stati Uniti","usa", categoryPath);
+        int id=categoryDao.createCategoryAndReturnCategoryId("Gli Stati Uniti","usa", categoryPath,1);
         List<Category> categoryFromPath = categoryDao.getCategoryFromPath(categoryPath);
         assertThat(categoryFromPath.size(), is(1));
         Category category = categoryFromPath.get(0);
@@ -54,8 +54,8 @@ public class CategoryDaoTest {
     public void testCategoryAlreadyExist() throws Exception, GenericErrorException, CategoryAlreadyExistException {
 
         String categoryPath = "la-francia";
-        categoryDao.createCategoryAndReturnCategoryId("La Francia","francia", categoryPath);
-        categoryDao.createCategoryAndReturnCategoryId("La Francia","francia", categoryPath);
+        categoryDao.createCategoryAndReturnCategoryId("La Francia","francia", categoryPath,1);
+        categoryDao.createCategoryAndReturnCategoryId("La Francia","francia", categoryPath,1);
 
     }
 

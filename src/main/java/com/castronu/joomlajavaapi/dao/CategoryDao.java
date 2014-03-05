@@ -34,8 +34,11 @@ public class CategoryDao extends HibernateDaoSupport {
         getHibernateTemplate().save(category);
     }
 
-    public Category load(Integer id) {
-        return (Category) getHibernateTemplate().load(Category.class, id);
+    public List<Category> getCategoryFromId(Integer id) {
+        DetachedCriteria query = DetachedCriteria.forClass(Category.class);
+        query.add(Property.forName("id").eq(id));
+        List<Category> byCriteria = getHibernateTemplate().findByCriteria(query);
+        return getHibernateTemplate().findByCriteria(query);
     }
 
 
@@ -48,11 +51,11 @@ public class CategoryDao extends HibernateDaoSupport {
     }
 
     @SuppressWarnings("unchecked")
-    public int createCategoryAndReturnCategoryId(String title, String alias, String path) throws GenericErrorException, CategoryAlreadyExistException {
+    public int createCategoryAndReturnCategoryId(String title, String alias, String path, int parentId) throws GenericErrorException, CategoryAlreadyExistException {
         if (getCategoryFromPath(path).size() != 0) {
             throw new CategoryAlreadyExistException(path);
         }
-        Category category = aCategoryWithPath(title,alias,path);
+        Category category = aCategoryWithPath(title,alias,path, parentId);
 
         try {
             getHibernateTemplate().save(JoomlaDslUtils.sanytize(category));

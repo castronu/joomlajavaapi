@@ -59,26 +59,27 @@ public class JoomlaJavaApi {
         contentDao.deleteArticle(tilte, categoryPath);
     }
 
-    private int createACategory(String categoryPath) throws GenericErrorException, CategoryAlreadyExistException {
+    private int createACategory(String categoryPath,int parentId) throws GenericErrorException, CategoryAlreadyExistException {
 
         String path = Converter.getPath(categoryPath);
         String alias = Converter.getAlias(categoryPath);
         String title = Converter.getTitle(categoryPath);
-        return categoryDao.createCategoryAndReturnCategoryId(title, alias, path);
+        return categoryDao.createCategoryAndReturnCategoryId(title, alias, path, parentId);
 
     }
 
     public void createCategoriesInCascade(String categoryPath) {
         String[] splittedPath = categoryPath.split("/");
         String internalPath = splittedPath[0];
-
+        int parentId=0;
         try {
-            createACategory(internalPath);
+            parentId=createACategory(internalPath, 1);
             LOGGER.info("Category {} created", internalPath);
         } catch (GenericErrorException e) {
             LOGGER.error("Category not created, error:", e);
         } catch (CategoryAlreadyExistException e) {
             LOGGER.info("Category {} already exist", e.getCategory());
+            parentId=categoryDao.getCategoryFromPath(e.getCategory()).get(0).getId();//To clean
         }
 
         if (splittedPath.length == 1) {
@@ -89,18 +90,19 @@ public class JoomlaJavaApi {
             internalPath += "/" + splittedPath[i];
 
             try {
-                createACategory(internalPath);
+                parentId=createACategory(internalPath,parentId);
                 LOGGER.info("Category {} created", internalPath);
             } catch (GenericErrorException e) {
                 LOGGER.error("Category not created, error:", e);
             } catch (CategoryAlreadyExistException e) {
                 LOGGER.info("Category {} already exist", e.getCategory());
+                parentId=categoryDao.getCategoryFromPath(e.getCategory()).get(0).getId();//To clean
             }
 
         }
     }
 
-    private void createMenuAndCategory(String internalPath) {
+    /*private void createMenuAndCategory(String internalPath) {
         String path = Converter.getPath(internalPath);
         String alias = Converter.getAlias(internalPath);
         String title = Converter.getTitle(internalPath);
@@ -114,7 +116,7 @@ public class JoomlaJavaApi {
             LOGGER.error("Problems creating category and menu, error:", e);
 
         }
-    }
+    }*/
 
 }
 

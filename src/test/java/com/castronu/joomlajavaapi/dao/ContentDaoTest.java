@@ -49,7 +49,7 @@ public class ContentDaoTest {
 
     @Test(expected = IllegalStateException.class)
     public void testCreateArticleErrorIfTwoArticleWithSameCategoryAndTitle() throws Exception, GenericErrorException {
-        Category category= CategoryBuilder.aCategoryWithPath("Category", "SuCategory", "category/suCategroy");
+        Category category= CategoryBuilder.aCategoryWithPath("Category", "SuCategory", "category/suCategroy",1);
         when(categoryDao.getCategoryFromPath("category/suCategroy")).
                 thenReturn(Arrays.asList(category,category));
         contentDao.createArticle("aTitle", "aContent", "category/suCategroy","","","","");

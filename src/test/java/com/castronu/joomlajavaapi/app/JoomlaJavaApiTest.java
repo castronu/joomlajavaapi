@@ -44,16 +44,40 @@ public class JoomlaJavaApiTest {
     }
 
     @Test
-    public void createCategoryTest2(){
+    public void createCategoryWithParents(){
 
-        joomlaJavaApi.createCategoriesInCascade("A/A1/");
+        joomlaJavaApi.createCategoriesInCascade("Sud America/Colombia/Santa Marta");
         //Two category should be created with path stati-uniti and il-michigan...
         //Let's use the dao to assert that the two categories exist...
-        List<Category> categoryFromPath = categoryDao.getCategoryFromPath("a");
+        List<Category> categoryFromPath = categoryDao.getCategoryFromPath("sud-america/colombia/santa-marta");
         assertThat(categoryFromPath.size(),is(1));
-        categoryFromPath = categoryDao.getCategoryFromPath("a/a1");
-        assertThat(categoryFromPath.size(),is(1));
+        int parentId = categoryFromPath.get(0).getParentId();
+        List<Category> parentCategoryList = categoryDao.getCategoryFromId(parentId);
+        assertThat(parentCategoryList.size(),is(1));
+        assertThat(parentCategoryList.get(0).getPath(),is("sud-america/colombia"));
+        assertThat(parentCategoryList.get(0).getTitle(),is("Colombia"));
+
 
     }
+
+    @Test
+    public void createCategoryWithParentsAndCategoryAlreadyExists(){
+
+        joomlaJavaApi.createCategoriesInCascade("Sud America/Colombia/Santa Marta");
+        joomlaJavaApi.createCategoriesInCascade("Sud America/Ecuador");
+        //Two category should be created with path stati-uniti and il-michigan...
+        //Let's use the dao to assert that the two categories exist...
+        List<Category> categoryFromPath = categoryDao.getCategoryFromPath("sud-america/ecuador");
+        assertThat(categoryFromPath.size(),is(1));
+        int parentId = categoryFromPath.get(0).getParentId();
+        List<Category> parentCategoryList = categoryDao.getCategoryFromId(parentId);
+        assertThat(parentCategoryList.size(),is(1));
+        assertThat(parentCategoryList.get(0).getPath(),is("sud-america"));
+        assertThat(parentCategoryList.get(0).getTitle(),is("Sud America"));
+
+
+    }
+
+
 
 }

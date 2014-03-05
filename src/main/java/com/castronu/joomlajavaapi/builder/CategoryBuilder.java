@@ -154,12 +154,12 @@ public class CategoryBuilder {
             return category;
         }
 
-    public static Category aCategoryWithPath(String title, String alias, String path) {
+    public static Category aCategoryWithPath(String title, String alias, String path, int parentId) {
         //Path:: catalunia/barcelona
         String[] splittedPath = path.split("/");
         int level = splittedPath.length;
         CategoryBuilder categoryBuilder=new CategoryBuilder();
-        categoryBuilder.withAssetId(16).withParentId(15).withLft(28).
+        categoryBuilder.withAssetId(1).withParentId(parentId).withLft(28).
                 withRgt(29).withExtension("com_content").withNote("").withDescription("").
                 withPublished(true).withCheckedOut(0).withCheckedOutTime(new Timestamp(0l)).
                 withAccess(1).withParams("{\"category_layout\":\"\",\"image\":\"\"}").
