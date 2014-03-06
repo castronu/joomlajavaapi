@@ -159,8 +159,7 @@ public class CategoryBuilder {
         String[] splittedPath = path.split("/");
         int level = splittedPath.length;
         CategoryBuilder categoryBuilder=new CategoryBuilder();
-        categoryBuilder.withAssetId(1).withParentId(parentId).withLft(28).
-                withRgt(29).withExtension("com_content").withNote("").withDescription("").
+        categoryBuilder.withAssetId(16).withParentId(parentId).withExtension("com_content").withNote("").withDescription("").
                 withPublished(true).withCheckedOut(0).withCheckedOutTime(new Timestamp(0l)).
                 withAccess(1).withParams("{\"category_layout\":\"\",\"image\":\"\"}").
                 withMetadesc("").withMetakey("").

@@ -34,6 +34,7 @@ public class MenuDao extends HibernateDaoSupport {
         int parentId = computeParentId(path);
         Menu menu = MenuBuilder.aMenuCategory(title, alias, path, categoryId,parentId);
         getHibernateTemplate().save(menu);
+        LOGGER.info("Menu "+ path + " created");
     }
 
     public int computeParentId(String path) throws GenericErrorException {

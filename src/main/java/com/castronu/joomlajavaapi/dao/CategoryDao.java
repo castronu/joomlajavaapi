@@ -4,13 +4,13 @@ import com.castronu.joomlajavaapi.domain.Category;
 import com.castronu.joomlajavaapi.exception.CategoryAlreadyExistException;
 import com.castronu.joomlajavaapi.exception.GenericErrorException;
 import com.castronu.joomlajavaapi.utils.JoomlaDslUtils;
-import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Property;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import static com.castronu.joomlajavaapi.builder.CategoryBuilder.aCategoryWithPath;
@@ -55,20 +55,88 @@ public class CategoryDao extends HibernateDaoSupport {
         if (getCategoryFromPath(path).size() != 0) {
             throw new CategoryAlreadyExistException(path);
         }
-        Category category = aCategoryWithPath(title,alias,path, parentId);
+
+        Category category = aCategoryWithPath(title, alias, path, parentId);
 
         try {
             getHibernateTemplate().save(JoomlaDslUtils.sanytize(category));
+            rebuildCategoryTree();
             List<Category> categoryFromPath = getCategoryFromPath(path);
             return categoryFromPath.get(0).getId();
         } catch (NoSuchMethodException e) {
-            throw new GenericErrorException("GRAVE" + path,e);
+            throw new GenericErrorException("GRAVE" + path, e);
         } catch (InvocationTargetException e) {
-            throw new GenericErrorException("GRAVE" + path,e);
+            throw new GenericErrorException("GRAVE" + path, e);
         } catch (IllegalAccessException e) {
-            throw new GenericErrorException("GRAVE" + path,e);
+            throw new GenericErrorException("GRAVE" + path, e);
         }
     }
+
+    private void rebuildCategoryTree() {
+
+        List<Category> categories = getHibernateTemplate().loadAll(Category.class);
+        for (Category category : categories) {
+            category.setRgt(-1);
+            category.setLft(-1);
+            persist(category);
+        }
+
+        DetachedCriteria query = DetachedCriteria.forClass(Category.class);
+        query.add(Property.forName("parentId").eq(1));
+        query.addOrder(Order.asc("id"));
+        List<Category> firstLevelCategories = getHibernateTemplate().findByCriteria(query);
+        Integer counter = 1;
+        counter = rebuildBranch(firstLevelCategories, counter);
+        //Get the ROOT
+        List<Category> categoryFromId = getCategoryFromPath("");
+        Category rootCategory = categoryFromId.get(0);
+        rootCategory.setLft(0);
+        rootCategory.setRgt(counter);
+        persist(rootCategory);
+
+
+    }
+
+    private int rebuildBranch(List<Category> categoriesToAnalyse, Integer counter) {
+        for (Category category : categoriesToAnalyse) {
+            category.setLft(counter++);
+            if (isLeaf(category)) {
+                category.setRgt(counter++);
+            } else {
+                DetachedCriteria query = DetachedCriteria.forClass(Category.class);
+                query.add(Property.forName("parentId").eq(category.getId()));
+                query.addOrder(Order.asc("id"));
+                List<Category> subCategories = getHibernateTemplate().findByCriteria(query);
+                counter=rebuildBranch(subCategories, counter);
+                category.setRgt(counter++);
+
+            }
+            persist(category);
+
+        }
+        return counter;
+    }
+
+    private void persist(Category category) {
+        Timestamp time = new Timestamp(0);
+        category.setCheckedOutTime(time);
+        category.setCreatedTime(time);
+        category.setModifiedTime(time);
+        getHibernateTemplate().update(category);
+    }
+
+    private boolean isLeaf(Category category) {
+        DetachedCriteria query = DetachedCriteria.forClass(Category.class);
+        query.add(Property.forName("parentId").eq(category.getId()));
+        List<Category> categories = getHibernateTemplate().findByCriteria(query);
+        if (categories.size() == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    ;
 
     @SuppressWarnings("unchecked")
     public void deleteCategory(String path) throws GenericErrorException {
@@ -78,8 +146,6 @@ public class CategoryDao extends HibernateDaoSupport {
         }
         getHibernateTemplate().delete(categoryFromPath.get(0));
     }
-
-
 
 
 }

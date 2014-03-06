@@ -8,6 +8,7 @@ import com.castronu.joomlajavaapi.domain.Category;
 import com.castronu.joomlajavaapi.domain.Content;
 import com.castronu.joomlajavaapi.domain.Menu;
 import com.castronu.joomlajavaapi.exception.GenericErrorException;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.castronu.joomlajavaapi.builder.CategoryBuilder.aCategoryWithPath;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -38,6 +40,13 @@ public class JoomlaJavaApiTest {
     ContentDao contentDao;
     @Autowired
     MenuDao menuDao;
+
+    @Before
+    public void init() throws GenericErrorException {
+        Category category = aCategoryWithPath("ROOT", "root", "", 0);
+        categoryDao.save(category);
+
+    }
 
     @Test
     public void createCategoryTest(){
@@ -65,6 +74,36 @@ public class JoomlaJavaApiTest {
         assertThat(parentCategoryList.size(),is(1));
         assertThat(parentCategoryList.get(0).getPath(),is("sud-america/colombia"));
         assertThat(parentCategoryList.get(0).getTitle(),is("Colombia"));
+
+    }
+
+    @Test
+    public void rgtLftCategoryTest(){
+
+        categoryDao.getHibernateTemplate().deleteAll(categoryDao.getHibernateTemplate().loadAll(Category.class));
+        //This is the root, should be always consistent (rgt is the max of all rgt, lft is 0)
+        Category category = aCategoryWithPath("ROOT", "root", "", 0);
+        categoryDao.save(category);
+
+        joomlaJavaApi.createCategoriesInCascade("Sud America/Ecuador");
+        //Assert root category
+        List<Category> categoryFromPath = categoryDao.getCategoryFromPath("");
+        Category rootCategory = categoryFromPath.get(0);
+        assertThat(rootCategory.getLft(),is(0));
+        assertThat(rootCategory.getRgt(),is(5));
+        //Assert brand new category
+        categoryFromPath = categoryDao.getCategoryFromPath("sud-america/ecuador");
+        Category newCategory = categoryFromPath.get(0);
+        assertThat(newCategory.getLft(),is(2));
+        assertThat(newCategory.getRgt(),is(3));
+
+        categoryFromPath = categoryDao.getCategoryFromPath("sud-america");
+        newCategory = categoryFromPath.get(0);
+        assertThat(newCategory.getLft(),is(1));
+        assertThat(newCategory.getRgt(),is(4));
+
+
+
 
     }
 
