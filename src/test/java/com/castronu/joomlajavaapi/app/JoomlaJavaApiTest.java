@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static com.castronu.joomlajavaapi.builder.CategoryBuilder.aCategoryWithPath;
+import static com.castronu.joomlajavaapi.builder.MenuBuilder.aMenu;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -45,6 +46,8 @@ public class JoomlaJavaApiTest {
     public void init() throws GenericErrorException {
         Category category = aCategoryWithPath("ROOT", "root", "", 0);
         categoryDao.save(category);
+        Menu menu = aMenu("ROOTMenu","root","",0);
+        menuDao.getHibernateTemplate().save(menu);
 
     }
 

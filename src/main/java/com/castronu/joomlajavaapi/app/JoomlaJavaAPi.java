@@ -43,17 +43,9 @@ public class JoomlaJavaApi {
         String parentCategoryPath = file.getParent();
 
         contentDao.createArticle(title.trim(), alias, content, link, path, description, keywords);
-
-        int categoryId = categoryDao.getCategoryFromPath(parentCategoryPath).get(0).getId();
-        /*int parentMenuId = menuDao.getMenuWithThisPath(parentCategoryPath).get(0).getId();
-
-        int articleId = contentDao.getArticleInCategoryFromCatiDAndTitle(title, categoryId).get(0).getId();
-
-        System.out.println(title + "  " + alias + "   " + path + "    " + articleId + "    " + parentMenuId);
-        menuDao.createMenuArticle(title, alias, path, articleId, parentMenuId);    */
     }
 
-    public void createArticleWithLinkedMenu(String title, String content, String link, String categoryPath, String description, String keywords) throws GenericErrorException {
+    public void createArticleWithMenu(String title, String content, String link, String categoryPath, String description, String keywords) throws GenericErrorException {
 
         String alias = Converter.getAlias(title);
         String path = Converter.getPath(categoryPath) + "/" + alias;
@@ -66,12 +58,9 @@ public class JoomlaJavaApi {
         contentDao.createArticle(title.trim(), alias, content, link, path, description, keywords);
 
         int categoryId = categoryDao.getCategoryFromPath(parentCategoryPath).get(0).getId();
-        /*int parentMenuId = menuDao.getMenuWithThisPath(parentCategoryPath).get(0).getId();
-
+        int parentMenuId = menuDao.getMenuWithThisPath(parentCategoryPath).get(0).getId();
         int articleId = contentDao.getArticleInCategoryFromCatiDAndTitle(title, categoryId).get(0).getId();
-
-        System.out.println(title + "  " + alias + "   " + path + "    " + articleId + "    " + parentMenuId);
-        menuDao.createMenuArticle(title, alias, path, articleId, parentMenuId);    */
+        menuDao.createMenuArticle(title, alias, path, articleId, parentMenuId);
     }
 
     public void deleteArticle(String tilte, String categoryPath) throws GenericErrorException {
@@ -137,6 +126,7 @@ public class JoomlaJavaApi {
         String title = Converter.getTitle(internalPath);
         int categoryId = createACategory(internalPath, parentId);
         menuDao.createMenuCategory(title, alias, path, categoryId);
+
         return categoryId;
 
     }

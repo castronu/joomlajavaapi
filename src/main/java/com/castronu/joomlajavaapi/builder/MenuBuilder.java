@@ -135,7 +135,7 @@ public class MenuBuilder {
         public Menu build() {
             return menu;
         }
-    private static Menu aMenu(String title, String alias, String path,int parentId) {
+    public static Menu aMenu(String title, String alias, String path,int parentId) {
         MenuBuilder menuBuilder = new MenuBuilder();
         String[] splittedPath = path.split("/");
         int level = splittedPath.length;
@@ -146,7 +146,7 @@ public class MenuBuilder {
                 withPublished(published).withComponentId(22).withCheckedOut(0).
                 withTemplateStyleId(0).
                 withParams("{\"show_category_title\":\"\",\"show_description\":\"\",\"show_description_image\":\"\",\"maxLevel\":\"\",\"show_empty_categories\":\"\",\"show_no_articles\":\"\",\"show_subcat_desc\":\"\",\"show_cat_num_articles\":\"\",\"page_subheading\":\"\",\"show_pagination_limit\":\"\",\"filter_field\":\"\",\"show_headings\":\"\",\"list_show_date\":\"\",\"date_format\":\"\",\"list_show_hits\":\"\",\"list_show_author\":\"\",\"orderby_pri\":\"\",\"orderby_sec\":\"\",\"order_date\":\"\",\"show_pagination\":\"\",\"show_pagination_results\":\"\",\"display_num\":\"10\",\"show_title\":\"\",\"link_titles\":\"\",\"show_intro\":\"\",\"show_category\":\"\",\"link_category\":\"\",\"show_parent_category\":\"\",\"link_parent_category\":\"\",\"show_author\":\"\",\"link_author\":\"\",\"show_create_date\":\"\",\"show_modify_date\":\"\",\"show_publish_date\":\"\",\"show_item_navigation\":\"\",\"show_vote\":\"\",\"show_readmore\":\"\",\"show_readmore_title\":\"\",\"show_icons\":\"\",\"show_print_icon\":\"\",\"show_email_icon\":\"\",\"show_hits\":\"\",\"show_noauth\":\"\",\"show_feed_link\":\"\",\"feed_summary\":\"\",\"menu-anchor_title\":\"\",\"menu-anchor_css\":\"\",\"menu_image\":\"\",\"menu_text\":1,\"page_title\":\"\",\"show_page_heading\":0,\"page_heading\":\"\",\"pageclass_sfx\":\"\",\"menu-meta_description\":\"\",\"menu-meta_keywords\":\"\",\"robots\":\"\",\"secure\":0}")
-        .withLft(11).withRgt(12).withHome(home).withLanguage("*").withClientId(clientId).
+        .withHome(home).withLanguage("*").withClientId(clientId).
                 withTitle(title).withAlias(alias).withPath(path).withAccess(1).
                         withLevel(level).withImg("img").
                 withParentId(parentId).build();
