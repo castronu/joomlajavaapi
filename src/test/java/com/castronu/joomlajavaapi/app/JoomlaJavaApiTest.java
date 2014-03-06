@@ -89,8 +89,13 @@ public class JoomlaJavaApiTest {
         categoryDao.save(category);
 
         joomlaJavaApi.createCategoriesInCascade("Sud America/Ecuador");
+
+        categoryDao.rebuildCategoryTree();
         //Assert root category
         List<Category> categoryFromPath = categoryDao.getCategoryFromPath("");
+
+
+
         Category rootCategory = categoryFromPath.get(0);
         assertThat(rootCategory.getLft(),is(0));
         assertThat(rootCategory.getRgt(),is(5));

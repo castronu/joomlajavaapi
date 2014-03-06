@@ -38,7 +38,6 @@ public class MenuDao extends HibernateDaoSupport {
         int parentId = computeParentId(path);
         Menu menu = MenuBuilder.aMenuCategory(title, alias, path, categoryId, parentId);
         getHibernateTemplate().save(menu);
-        rebuildMenuTree();
         LOGGER.info("Menu "+ path + " created");
     }
 
@@ -56,7 +55,7 @@ public class MenuDao extends HibernateDaoSupport {
 
     }
     //TODO These private methods should be refactored in a Generic Rebuilder class...
-    private void rebuildMenuTree() {
+    public void rebuildMenuTree() {
 
         List<Menu> menus = getHibernateTemplate().loadAll(Menu.class);
         for (Menu menu : menus) {

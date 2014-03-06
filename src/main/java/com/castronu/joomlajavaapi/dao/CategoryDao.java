@@ -60,7 +60,6 @@ public class CategoryDao extends HibernateDaoSupport {
 
         try {
             getHibernateTemplate().save(JoomlaDslUtils.sanytize(category));
-            rebuildCategoryTree();
             List<Category> categoryFromPath = getCategoryFromPath(path);
             return categoryFromPath.get(0).getId();
         } catch (NoSuchMethodException e) {
@@ -72,7 +71,7 @@ public class CategoryDao extends HibernateDaoSupport {
         }
     }
 
-    private void rebuildCategoryTree() {
+    public void rebuildCategoryTree() {
 
         List<Category> categories = getHibernateTemplate().loadAll(Category.class);
         for (Category category : categories) {

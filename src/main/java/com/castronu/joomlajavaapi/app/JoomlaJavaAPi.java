@@ -45,22 +45,32 @@ public class JoomlaJavaApi {
         contentDao.createArticle(title.trim(), alias, content, link, path, description, keywords);
     }
 
-    public void createArticleWithMenu(String title, String content, String link, String categoryPath, String description, String keywords) throws GenericErrorException {
+    public void createArticleWithMenu(String title, String content, String link, String categoryPath, String description, String keywords) {
 
         String alias = Converter.getAlias(title);
         String path = Converter.getPath(categoryPath) + "/" + alias;
-        System.out.println("title=" + title + "alias=" + alias + " Path=" + path);
 
         File file = new File(path);
 
         String parentCategoryPath = file.getParent();
 
-        contentDao.createArticle(title.trim(), alias, content, link, path, description, keywords);
+        try {
+            contentDao.createArticle(title.trim(), alias, content, link, path, description, keywords);
+        } catch (GenericErrorException e) {
+            LOGGER.error(e.getMessage());
+            return;
+        }
 
         int categoryId = categoryDao.getCategoryFromPath(parentCategoryPath).get(0).getId();
         int parentMenuId = menuDao.getMenuWithThisPath(parentCategoryPath).get(0).getId();
         int articleId = contentDao.getArticleInCategoryFromCatiDAndTitle(title, categoryId).get(0).getId();
         menuDao.createMenuArticle(title, alias, path, articleId, parentMenuId);
+    }
+
+    public void finalize() throws GenericErrorException {
+        categoryDao.rebuildCategoryTree();
+        menuDao.rebuildMenuTree();
+        LOGGER.info("Process finished!");
     }
 
     public void deleteArticle(String tilte, String categoryPath) throws GenericErrorException {

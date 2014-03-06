@@ -18,6 +18,10 @@ public class JoomlaJavaApiStandalone {
     public static void createArticle(String title,String content,String link,String categoryPath,String description,String keywords) throws GenericErrorException {
         joomlaJavaApi.createArticle(title,content,link,categoryPath,description,keywords);
     }
+    public static void createArticleWithMenu(String title,String content,String link,String categoryPath,String description,String keywords) throws GenericErrorException {
+        joomlaJavaApi.createArticleWithMenu(title, content, link, categoryPath, description, keywords);
+    }
+
     public static void createCategory(String categoryPath) {
         joomlaJavaApi.createCategoriesInCascade(categoryPath);
     }
@@ -26,5 +30,8 @@ public class JoomlaJavaApiStandalone {
     }
     public static void createMenuForCategory(String categoryPath) {
         joomlaJavaApi.createMenuForCategory(categoryPath);
+    }
+    public static void finalizeJob() throws GenericErrorException {
+        joomlaJavaApi.finalize();
     }
 }
